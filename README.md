@@ -8,6 +8,6 @@
    - [X]Logs the event instead of saving to the DB
  - [X] Create front-end app to make the new event 
  - [X] Create form to submit a new event (name and date)
- - [ ] Dockerize the frontend and backend.
+ - [X] Dockerize the frontend and backend.
  - [ ] Add connection to MySQL
    - Persist the created event
