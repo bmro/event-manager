@@ -4,7 +4,7 @@
 
 1. User registers a new event.
  - [ ] Create backend to accept a new event
- - [ ] Define api to register a new event POST /api/event (name and date)
+ - [ ] Define api to register a new event POST /api/events (name and date)
    - Logs the event instead of saving to the DB
  - [ ] Create front-end app to make the new event 
  - [ ] Create form to submit a new event (name and date)
