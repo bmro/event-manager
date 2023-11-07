@@ -1,8 +1,7 @@
 from flask import current_app, Blueprint, request, jsonify
-from .api_base import api_base_blueprint
 from datetime import datetime
 
-events_blueprint = Blueprint('events', __name__, url_prefix='/events')
+events_blueprint = Blueprint('events', __name__)
 
 events = []
 
@@ -13,7 +12,7 @@ def is_valid_date(date_value):
     except ValueError:
         return False
 
-@events_blueprint.route('/', methods=['POST'])
+@events_blueprint.route('/events', methods=['POST'])
 def create_event():
     event_data = request.get_json()
     
@@ -28,7 +27,7 @@ def create_event():
     events.append(event_data)
     return jsonify({'message': 'Event registered successfully'}), 201
 
-@events_blueprint.route('/', methods=['GET'])
+@events_blueprint.route('/events', methods=['GET'])
 def list_events():
     current_app.logger.info("List events")
     return jsonify({'events': events}), 200
