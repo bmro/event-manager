@@ -1,18 +1,59 @@
 version: '3'
 
 services:
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-eZUh8uTxAbfG}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-eventmanager_db}
+      MYSQL_USER: ${MYSQL_USER:-eventmanager_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-EfjwhGNg4daE}
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 10s
+      retries: 10
+      start_period: 20s
+      timeout: 5s
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
   backend:
     build: ./backend
     ports:
       - "5000:5000"
     environment:
-      - FLASK_ENV=development
-      - DEBUG_MODE=True
-      - LOG_LEVEL=Debug
+      SQLALCHEMY_DATABASE_URI: ${SQLALCHEMY_DATABASE_URI:-mysql+pymysql://eventmanager_user:EfjwhGNg4daE@db/eventmanager_db}
+      FLASK_ENV: development
+      DEBUG_MODE: True
+      LOG_LEVEL: Debug
+    healthcheck:
+      test: curl -f http://localhost:5000/health || exit 1
+      interval: 10s
+      retries: 10
+      start_period: 20s
+      timeout: 5s
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - migration-data:/usr/src/app
 
   frontend:
     build: ./frontend
     ports:
       - "8000:8000"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+
+volumes:
+  db-data:
+  migration-data:

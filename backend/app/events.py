@@ -1,9 +1,9 @@
 from flask import current_app, Blueprint, request, jsonify
 from datetime import datetime
+from .models import Event
+from .extensions import db
 
 events_blueprint = Blueprint('events', __name__)
-
-events = []
 
 def is_valid_date(date_value):
     try:
@@ -24,10 +24,14 @@ def create_event():
         current_app.logger.warning("Invalid or missing date")
         return jsonify({'error': 'Invalid or missing date.', 'format': 'YYYY-MM-DD'}), 400
     
-    events.append(event_data)
+    new_event = Event(name=event_data['name'], date=datetime.strptime(event_data['date'], '%Y-%m-%d'))
+    db.session.add(new_event)
+    db.session.commit()
     return jsonify({'message': 'Event registered successfully'}), 201
 
 @events_blueprint.route('/events', methods=['GET'])
 def list_events():
+    events = Event.query.all()
+    events_list = [{"name": event.name, "date": event.date.strftime('%Y-%m-%d')} for event in events]
     current_app.logger.info("List events")
-    return jsonify({'events': events}), 200
+    return jsonify({'events': events_list}), 200
