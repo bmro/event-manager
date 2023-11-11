@@ -6,6 +6,7 @@ from .extensions import db
 events_blueprint = Blueprint('events', __name__)
 
 def is_valid_date(date_value):
+    current_app.logger.debug("validating date `%s`", date_value)
     try:
         datetime.strptime(date_value, '%Y-%m-%d')
         return True
@@ -15,6 +16,7 @@ def is_valid_date(date_value):
 @events_blueprint.route('/events', methods=['POST'])
 def create_event():
     event_data = request.get_json()
+    current_app.logger.debug("creating event, raw data `%s`", event_data)
     
     if 'name' not in event_data or not isinstance(event_data['name'], str):
         current_app.logger.warning("Invalid or missing name")
@@ -25,8 +27,10 @@ def create_event():
         return jsonify({'error': 'Invalid or missing date.', 'format': 'YYYY-MM-DD'}), 400
     
     new_event = Event(name=event_data['name'], date=datetime.strptime(event_data['date'], '%Y-%m-%d'))
+    current_app.logger.debug("creating event, new_event data `%s`", new_event)
     db.session.add(new_event)
     db.session.commit()
+    current_app.logger.info("Event registered successfully")
     return jsonify({'message': 'Event registered successfully'}), 201
 
 @events_blueprint.route('/events', methods=['GET'])
