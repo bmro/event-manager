@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "event-manager.fullname" . }}-frontend
+  labels:
+    {{- include "event-manager.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "event-manager.fullname" . }}-frontend
+  template:
+    metadata:
+      labels:
+        app: {{ include "event-manager.fullname" . }}-frontend
+    spec:
+      initContainers:
+      - name: wait-for-backend
+        image: appropriate/curl  # or any other image that has curl
+        command: ['sh', '-c', 'until curl -f http://{{ include "event-manager.fullname" . }}-backend:{{ .Values.backend.port }}/health; do echo "Waiting for Backend"; sleep 2; done;']
+      containers:
+      - name: frontend
+        image: "{{ .Values.frontend.image }}"
+        ports:
+        - containerPort: {{ .Values.frontend.port }}
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
+        volumeMounts:
+        - name: config-volume
+          mountPath: /usr/src/app/config.json
+          subPath: config.json
+          readOnly: true
+      volumes:
+      - name: config-volume
+        configMap:
+          name: {{ include "event-manager.fullname" . }}-frontend-config

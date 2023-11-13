@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "event-manager.fullname" . }}-backend
+  labels:
+    {{- include "event-manager.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "event-manager.fullname" . }}-backend
+  template:
+    metadata:
+      labels:
+        app: {{ include "event-manager.fullname" . }}-backend
+    spec:
+      initContainers:
+      - name: wait-for-mysql
+        image: busybox
+        command: ['sh', '-c', 'until nc -z {{ .Release.Name }}-mysql 3306; do echo "Waiting for MySQL"; sleep 2; done;']
+      containers:
+      - name: backend
+        image: "{{ .Values.backend.image }}"
+        ports:
+        - containerPort: {{ .Values.backend.port }}
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
+        env:
+        - name: SQLALCHEMY_DATABASE_URI
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "event-manager.fullname" . }}-secrets
+              key: sqlalchemy-database-uri

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "event-manager.fullname" . }}-frontend
+  labels:
+    {{- include "event-manager.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+  - port: {{ .Values.frontend.port }}
+    targetPort: {{ .Values.frontend.port }}
+  selector:
+    app: {{ include "event-manager.fullname" . }}-frontend

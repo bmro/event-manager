@@ -1,0 +1,19 @@
+
+backend:
+  image: bmro/event-manager-backend
+  port: 5000
+
+frontend:
+  image: bmro/event-manager-frontend
+  port: 8000
+
+mysql:
+  auth:
+    rootPassword: "eZUh8uTxAbfG"
+    database: "eventmanager_db"
+    username: "eventmanager_user"
+    password: "EfjwhGNg4daE"
+  primary:
+    service:
+      ports:
+        mysql: 3306

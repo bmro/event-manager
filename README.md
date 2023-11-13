@@ -13,6 +13,16 @@
    - [X] Persist the created event
 
 2. Deploy it on Kubernetes
- - [ ] StatefulSet, Service, ConfigMap, Secrets Database
- - [ ] Deployment, Service, ConfigMap, Secrets Backend
- - [ ] Deployment, Service, ConfigMap, Secrets Frontend
+  - [X] Create Helm Chart
+    - [X] Database Chart as dependency
+    - [X] ~~StatefulSet, Service, ConfigMap, Secrets Database~~
+    - [X] Backend Deployment, Service, Secrets, HPA
+    - [X] Frontend Deployment, Service, ConfigMap, HPA
+
+3. Document deployment
+  - [ ] How to run locally 
+  - [ ] How to build Docker
+  - [ ] How to user docker-compose
+  - [ ] How to deploy with Helm
+  - [ ] Describing a few choices
+  - [ ] What is missing
